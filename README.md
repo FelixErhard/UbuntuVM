@@ -77,17 +77,16 @@ Dieses Template erstellt einen vollständig konfigurierten Node.js Development S
 ```json
 {
   "template_id": 4,
-  "user_id": 1,
   "parameters": {
     "project_name": "web-engineering-group-a",
+    "admin_email": "admin@dhbw.de",
     "student_emails": [
       "student1@dhbw.de",
       "student2@dhbw.de",
       "student3@dhbw.de"
     ],
     "node_version": "20",
-    "flavor_name": "gp1.medium",
-    "git_repo_url": "https://github.com/username/project.git"
+    "flavor_name": "gp1.medium"
   }
 }
 ```
