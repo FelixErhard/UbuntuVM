@@ -1,0 +1,96 @@
+template:
+  name: "nodejs-dev-server"
+  display_name: "Node.js Development Server"
+  description: "Kollaborative Node.js Entwicklungsumgebung für Projektgruppen mit Shared-Workspace."
+  version: "1.1.0"
+  category: "education"
+  author: "DHBW CloudStore Team"
+  icon: nodejs.png
+
+  terraform:
+    working_dir: terraform/
+    required_version: ">= 1.6.0"
+
+  tags:
+    - nodejs
+    - javascript
+    - education
+    - group-work
+
+  parameters:
+    - name: project_name
+      type: string
+      description: "Projektname (wird Hostname und Name des Shared-Folders)"
+      required: true
+      validation:
+        pattern: "^[a-zA-Z0-9-_]{3,20}$"
+
+    - name: admin_email
+      type: string
+      description: "E-Mail des Dozenten (erhält Sudo-Rechte)"
+      required: true
+      validation:
+        pattern: "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
+
+    - name: student_emails
+      type: array
+      description: "E-Mails der Gruppenmitglieder"
+      required: true
+      validation:
+        min_items: 1
+        max_items: 10
+
+    - name: flavor_name
+      type: selection
+      description: "Ressourcen (Quota)"
+      required: true
+      options:
+        - label: "Small (1 CPU, 2GB RAM)"
+          value: "gp1.small"
+        - label: "Medium (2 CPU, 4GB RAM)"
+          value: "gp1.medium"
+        - label: "Large (4 CPU, 8GB RAM)"
+          value: "gp1.large"
+      default: "gp1.medium"
+
+    - name: node_version
+      type: selection
+      description: "Node.js Version"
+      required: true
+      options:
+        - label: "Node.js 20 (LTS)"
+          value: "20"
+        - label: "Node.js 18 (LTS)"
+          value: "18"
+      default: "20"
+
+    - name: git_repo_url
+      type: string
+      description: "Git Repository URL (wird in den Shared Folder geklont)"
+      required: false
+      validation:
+        pattern: "^https?://.*\.git$|^$"
+
+  outputs:
+    - name: app_url
+      description: "Web-Server URL (Port 3000)"
+      display: true
+    - name: ssh_command
+      description: "SSH Befehl (Allgemein)"
+      display: true
+    - name: admin_credentials
+      description: "Admin Login (Dozent)"
+      sensitive: true
+      display: false
+    - name: student_credentials
+      description: "Studenten Logins"
+      sensitive: true
+      display: false
+
+  estimated_costs:
+    hourly: "0.10 - 0.25 EUR"
+    monthly: "70 - 180 EUR"
+
+  requirements:
+    - "SSH Port 22 access"
+    - "Node.js application ports 3000, 8080"

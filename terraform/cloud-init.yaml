@@ -1,0 +1,98 @@
+#cloud-config
+ssh_pwauth: true  # <--- WICHTIG: Erlaubt Passwort-Login generell
+package_update: true
+package_upgrade: true
+
+packages:
+  - curl
+  - git
+  - build-essential
+  - htop
+  - net-tools
+  - ufw
+  - acl
+
+write_files:
+  # NVM Setup
+  - path: /etc/profile.d/nvm_env.sh
+    permissions: '0644'
+    content: |
+      export NVM_DIR="/usr/local/nvm"
+      [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+
+  # Welcome App
+  - path: /opt/welcome-app/server.js
+    permissions: '0644'
+    content: |
+      const http = require('http');
+      const server = http.createServer((req, res) => {
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'text/html; charset=utf-8');
+        res.end(`
+           <div style="text-align:center; padding:50px; font-family:sans-serif;">
+             <h1 style="color:#4CAF50;">🚀 Node.js Shared Workspace Ready!</h1>
+             <p>Dieser Server ist für Gruppenarbeit konfiguriert.</p>
+             <div style="background:#eee; padding:15px; margin:20px auto; width:fit-content;">
+                <strong>Dein Projekt-Ordner:</strong> ~/project (Verknüpfung zu /opt/${project_name})
+             </div>
+             <p>Login per SSH, dann: <code>pm2 stop welcome</code></p>
+           </div>
+        `);
+      });
+      server.listen(3000, '0.0.0.0');
+
+runcmd:
+  # 1. SSH Config für Passwörter erzwingen (Sicherheitsnetz)
+  - sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/g' /etc/ssh/sshd_config
+  - sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/g' /etc/ssh/sshd_config.d/*.conf || true
+  - systemctl restart ssh
+
+  # 2. Install Node & Tools
+  - curl -fsSL https://deb.nodesource.com/setup_${node_version}.x | sudo -E bash -
+  - apt-get install -y nodejs
+  - npm install -g pm2 nodemon typescript yarn
+  - mkdir -p /usr/local/nvm
+  - curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | NVM_DIR=/usr/local/nvm bash
+  
+  # 3. Shared Workspace Setup
+  - groupadd webdevs
+  - mkdir -p /opt/${project_name}
+  # SetGID Bit: Neue Dateien erben automatisch die Gruppe
+  - chown root:webdevs /opt/${project_name}
+  - chmod 2775 /opt/${project_name}
+  
+  # NVM Rechte für alle
+  - chown -R root:webdevs /usr/local/nvm
+  - chmod -R 775 /usr/local/nvm
+
+  # 4. User Creation (Admin & Students)
+  
+  # Admin (Dozent)
+  - useradd -m -s /bin/bash -G sudo,webdevs ${admin_username}
+  - echo '${admin_username}:${admin_password}' | chpasswd
+  - ln -s /opt/${project_name} /home/${admin_username}/project
+  - chown -h ${admin_username}:${admin_username} /home/${admin_username}/project
+
+  # Students Loop
+%{ for student in students ~}
+  - useradd -m -s /bin/bash -G webdevs ${student.username}
+  - echo '${student.username}:${student.password}' | chpasswd
+  - ln -s /opt/${project_name} /home/${student.username}/project
+  - chown -h ${student.username}:${student.username} /home/${student.username}/project
+%{ endfor ~}
+
+  # 5. Git Clone
+  - |
+    if [ -n "${git_repo_url}" ]; then
+      rm -rf /opt/${project_name}/*
+      git clone "${git_repo_url}" /opt/${project_name}
+      chown -R root:webdevs /opt/${project_name}
+      chmod -R 2775 /opt/${project_name}
+    fi
+
+  # 6. Start Welcome App & Firewall
+  - pm2 start /opt/welcome-app/server.js --name welcome
+  - pm2 save
+  - pm2 startup systemd
+  - ufw allow 22,3000,8080/tcp
+  - echo "y" | ufw enable

@@ -1,0 +1,14 @@
+coverage.xml
+# Terraform
+.terraform/
+.terraform.lock.hcl
+*.tfstate
+*.tfstate.*
+*.tfvars
+.deployment-*/
+clouds.yaml
+workspaces/
+ma_wwi_23seb_projekt_2-openrc.sh
+private_key.pem
+nodejs_key.pem
+key.pem
