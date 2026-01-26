@@ -1,154 +1,305 @@
-# Node.js Group Project Server (IaC)
+# Node.js Development Server Template
 
-> **Modul:** Cloud Computing & Web Engineering  
-> **Status:** Production Ready (v1.1.0)  
-> **Technologie:** Terraform, Cloud-Init, OpenStack
+Multi-User Node.js Development Environment für Gruppenarbeit und Web Engineering Kurse an der DHBW.
 
-## Projektbeschreibung
+## Überblick
 
-Dieses Repository stellt eine **Infrastructure-as-Code (IaC)** Definition bereit, um eine vollautomatisierte, kollaborative Entwicklungsumgebung für Studierenden-Gruppen zu deployen.
+Dieses Template erstellt einen vollständig konfigurierten Node.js Development Server mit:
 
-Das Ziel ist die Bereitstellung eines **"Zero-Configuration" Servers**, der spezifisch auf die Anforderungen der Lehrveranstaltung zugeschnitten ist (User Story ID 101):
-1.  **Sofort einsatzbereit:** Node.js, NVM, Git und PM2 sind vorinstalliert.
-2.  **Kollaborativ:** Ein Shared-Workspace-Konzept erlaubt das gemeinsame Bearbeiten von Dateien ohne Berechtigungskonflikte.
-3.  **Ressourcen-Kontrolle:** CPU/RAM-Quotas werden über OpenStack Flavors strikt durchgesetzt.
+- ✅ **Multi-User Support**: Separate Accounts für jeden Studierenden
+- ✅ **Node.js v20 LTS**: Aktuelle LTS-Version mit NPM
+- ✅ **Development Tools**: PM2, Nodemon, TypeScript, NVM vorinstalliert
+- ✅ **Shared Workspace**: Kollaboratives Arbeiten ohne Berechtigungskonflikte
+- ✅ **Process Management**: PM2 für persistente App-Ausführung
+- ✅ **Automatische User-Erstellung**: Alle Studierenden werden beim Deployment angelegt
+- ✅ **Resource Management**: CPU/RAM-Quotas über OpenStack Flavors
+- ✅ **Secure Password Generation**: Zufällige, starke Passwörter für jeden User
 
----
+## Architektur
 
-## Architektur & Design
-
-Die Infrastruktur basiert auf einer einzelnen Ubuntu 22.04 Instanz, die durch Security Groups abgeschirmt ist. Die Besonderheit liegt in der **internen Berechtigungsstruktur**.
-
-```mermaid
-graph TD
-    Internet((Internet)) -->|TCP 22| SSH[SSH-Daemon]
-    Internet -->|TCP 3000| App[Node.js-App]
-    Internet -->|TCP 8080| Alt[Alt-Port]
-    
-    subgraph VM["Ubuntu VM (Quota Managed)"]
-        SSH --> Admin[Dozent-Sudo]
-        SSH --> S1[Student1]
-        SSH --> S2[Student2]
-        
-        Admin -.->|Link| Shared[/opt/project]
-        S1 -.->|Link| Shared
-        S2 -.->|Link| Shared
-        
-        subgraph WS["Shared Workspace (SGID)"]
-            Shared --> Code[Source-Code]
-            Code --> Git[Git-Repo]
-        end
-    end
+```
+┌─────────────────────────────────────────────┐
+│          Internet (HTTP:3000, 8080)         │
+└──────────────────┬──────────────────────────┘
+                   │
+┌──────────────────▼──────────────────────────┐
+│         Node.js Development VM              │
+│   ┌─────────────────────────────────────┐   │
+│   │  student1_test_de                   │   │
+│   │  → /home/student1_test_de/project   │   │
+│   │  → Node.js + NPM + PM2 + NVM       │   │
+│   └─────────────────────────────────────┘   │
+│                                             │
+│   ┌─────────────────────────────────────┐   │
+│   │  student2_test_de                   │   │
+│   │  → Individual project directory     │   │
+│   │  → Git repo auto-cloned (optional)  │   │
+│   └─────────────────────────────────────┘   │
+│                                             │
+│   ┌─────────────────────────────────────┐   │
+│   │  Ubuntu User (SSH Access)          │   │
+│   │  → Server administration           │   │
+│   │  → PM2 process monitoring          │   │
+│   └─────────────────────────────────────┘   │
+└─────────────────────────────────────────────┘
 ```
 
-### Technische Highlights
+## Parameter
 
-**SetGID Bit (chmod 2775):** Der zentrale Projektordner `/opt/project` nutzt das SetGID-Bit. Dadurch erben alle neu erstellten Dateien automatisch die Gruppe `webdevs` statt der primären Gruppe des Erstellers. Dies verhindert effektiv "Permission Denied"-Fehler bei der Gruppenarbeit.
+### Pflichtparameter
 
-**Welcome-App:** Ein via cloud-init injiziertes Node.js-Skript startet beim Booten automatisch auf Port 3000. Dies dient als "Alive-Check" für die Studierenden.
+| Parameter | Typ | Beschreibung |
+|-----------|-----|--------------|
+| `project_name` | `string` | Projektname (definiert Hostname und Ordnername) |
+| `student_emails` | `array` | Liste der Studierenden-E-Mails |
+| `admin_email` | `string` | Email-Adresse des Admins |
+### Optional
 
-**Passwort-Auth:** Aus Usability-Gründen wurde PasswordAuthentication aktiviert, um die Hürde des SSH-Key-Austauschs in studentischen Gruppen zu eliminieren.
+| Parameter | Typ | Standard | Beschreibung |
+|-----------|-----|----------|--------------|
+| `node_version` | `selection` | `"20"` | Node.js Version ("20" LTS oder "18") |
+| `git_repo_url` | `string` | `""` | Git-Repository URL zum auto-clonen |
+| `flavor_name` | `selection` | `"gp1.medium"` | VM-Größe (Small/Medium/Large) |
 
-## Deployment (Für Dozenten)
+### Infrastruktur (in `terraform.tfvars`)
 
-### Voraussetzungen
-- Terraform >= 1.6.0
-- Zugriff auf OpenStack (via clouds.yaml oder Environment Variables)
+| Parameter | Typ | Standard | Beschreibung |
+|-----------|-----|----------|--------------|
+| `image_name` | `string` | `"Ubuntu 22.04"` | OS Image Name |
+| `network_name` | `string` | `"NAT"` | Internes Netzwerk |
+| `external_network_name` | `string` | `"DHBW"` | Externes Netzwerk für Floating IP |
+| `floating_ip_pool` | `string` | `"DHBW"` | Pool für öffentliche IPs |
 
-### Installation
+## Deployment-Beispiel
 
-**Initialisierung:**
+### Über CloudStore API
+
+```json
+{
+  "template_id": 4,
+  "user_id": 1,
+  "parameters": {
+    "project_name": "web-engineering-group-a",
+    "student_emails": [
+      "student1@dhbw.de",
+      "student2@dhbw.de",
+      "student3@dhbw.de"
+    ],
+    "node_version": "20",
+    "flavor_name": "gp1.medium",
+    "git_repo_url": "https://github.com/username/project.git"
+  }
+}
+```
+
+### Manuelles Deployment
+
 ```bash
 cd terraform
 terraform init
-```
 
-**Konfiguration:**
-Passen Sie die Variablen in `terraform.tfvars` an (oder übergeben Sie sie via CLI):
-```terraform
-project_name   = "web-engineering-group-a"
-admin_email    = "dozent@dhbw.de"
-student_emails = ["s1@dhbw.de", "s2@dhbw.de", "s3@dhbw.de"]
-flavor_name    = "gp1.medium"  # Steuert die Quotas (2 vCPU, 4GB RAM)
-```
+# terraform.tfvars anpassen
+nano terraform.tfvars
 
-**Deployment:**
-```bash
+# Deployment starten
 terraform apply
 ```
 
-**Übergabe:**
-Nach erfolgreichem Durchlauf gibt Terraform die Zugangsdaten aus. Diese müssen sicher an die Studierenden übermittelt werden:
-```bash
-terraform output student_credentials
-terraform output admin_credentials
-```
+## Outputs
 
-## Nutzungshandbuch (Für Studierende)
+### Public Outputs
 
-Ihr Team hat Zugriff auf einen gemeinsamen Linux-Server. Gehen Sie wie folgt vor:
+| Output | Beschreibung | Beispiel |
+|--------|--------------|----------|
+| `ssh_command` | SSH-Verbindungskommando | `ssh ubuntu@141.72.XXX.XXX` |
+| `app_url` | Node.js App URL (Port 3000) | `http://141.72.XXX.XXX:3000` |
+| `server_info` | VM-Details | `{"deployment_id": "...", "student_count": 3}` |
+| `installed_tools` | Entwicklungstools | `["Node.js 20", "NPM", "PM2", ...]` |
+| `access_instructions` | Zugangsanleitung | Multi-line Text |
 
-### 1. Verbinden
-Nutzen Sie die erhaltenen Zugangsdaten:
-```bash
-ssh username@<SERVER-IP>
-# Passwort eingeben
-```
+### Sensitive Outputs (via `/deployments/{id}/keys`)
 
-### 2. Arbeitsumgebung vorbereiten
-Wenn Sie sich einloggen, läuft bereits eine Demo-App ("Welcome App").
-- Prüfen Sie im Browser: `http://<SERVER-IP>:3000`
-- Stoppen Sie die Demo, um den Port freizumachen:
-```bash
-pm2 stop welcome
-```
+| Output | Beschreibung |
+|--------|--------------|
+| `student_credentials` | Map: `email -> {"username": "student1_test_de", "password": "...", "ssh_command": "...", "project_directory": "..."}` |
+| `ssh_private_key` | SSH Private Key (RSA 4096-bit) |
+| `floating_ip` | Öffentliche IP-Adresse |
+| `internal_ip` | Interne IP-Adresse |
 
-### 3. Entwickeln
-Arbeiten Sie ausschließlich im Ordner `project` in Ihrem Home-Verzeichnis. Dieser ist magisch mit Ihren Teamkollegen verknüpft.
-```bash
-cd ~/project
-# Hier git clone, npm install, etc. durchführen
-```
+## Benutzernamen-Konvention
 
-### 4. App starten
-Nutzen Sie pm2, damit Ihre App auch weiterläuft, wenn Sie die Konsole schließen:
-```bash
-# Beispiel
-pm2 start index.js --name mein-projekt
-```
+**Wichtig**: Email-Adressen werden automatisch in gültige Unix-Usernamen umgewandelt:
+
+- `@` wird zu `_`
+- `.` wird zu `_`
+- Alles in Kleinbuchstaben
+
+**Beispiele**:
+
+| Email | Username |
+|-------|----------|
+| `student1@test.de` | `student1_test_de` |
+| `Max.Mustermann@dhbw.de` | `max_mustermann_dhbw_de` |
+| `developer@mail.dhbw-mannheim.de` | `developer_mail_dhbw-mannheim_de` |
+
+## Zugriff
+
+### Studierende
+
+1. **SSH-Verbindung**: `ssh username@<floating-ip>` (aus `student_credentials`)
+2. **Passwort**: Aus `student_credentials[email].password`
+3. **Projektverzeichnis**: `/home/<username>/<project_name>/`
+4. **App starten**:
+   ```bash
+   cd ~/my-nodejs-project
+   node app.js &
+   # oder mit PM2:
+   pm2 start app.js --name myapp
+   ```
+5. **Browser**: `http://<floating-ip>:3000`
+
+### Administrator (SSH-Key)
+
+1. **SSH mit Private Key**:
+   ```bash
+   ssh -i private_key.pem ubuntu@<floating-ip>
+   ```
+2. **Benutzer-Übersicht**:
+   ```bash
+   ls -la /home/
+   ```
+3. **PM2 Prozesse verwalten**:
+   ```bash
+   pm2 status
+   pm2 logs
+   ```
+
+## Resource Allocation
+
+Ressourcen werden **pro Flavor** zugewiesen:
+
+| Flavor | vCPU | RAM | Beschreibung |
+|--------|------|-----|--------------|
+| `gp1.small` | 1 | 2GB | Für kleine Teams (1-2 Studierende) |
+| `gp1.medium` | 2 | 4GB | Standard für 3-4 Studierende |
+| `gp1.large` | 4 | 8GB | Für größere Teams oder ressourcenintensive Apps |
+
+**Wichtig**: Die Ressourcen werden von **allen Studierenden geteilt**!
 
 ## Technische Details
 
+### Cloud-Init Prozess
+
+1. **System-Setup**: Ubuntu 22.04, Updates, Grundpakete
+2. **Node.js Installation**: Spezifizierte Version via NodeSource
+3. **NVM Installation**: Global für alle Benutzer
+4. **NPM Global Packages**: PM2, Nodemon, TypeScript
+5. **User-Erstellung**: Automatisch für alle Studierenden
+6. **Projektverzeichnisse**: `/home/<username>/<project_name>/`
+7. **Git-Clone**: Optional, falls `git_repo_url` angegeben
+8. **Firewall-Setup**: UFW für Ports 22, 3000, 8080
+
 ### Installierte Software
+
 | Tool | Version | Zweck |
 |------|---------|-------|
-| Node.js | v20 (LTS) oder v18 | Laufzeitumgebung |
-| NVM | Latest | Node Version Manager (Versionswechsel) |
-| PM2 | Latest | Process Manager (Keep-Alive, Logs) |
-| Git | Latest | Versionierung |
-| UFW | - | Uncomplicated Firewall |
+| Node.js | v20/v18 | JavaScript Runtime |
+| NPM | Latest | Package Manager |
+| NVM | Latest | Node Version Manager |
+| PM2 | Latest | Process Manager |
+| Nodemon | Latest | Development Tool |
+| TypeScript | Latest | Type-Safe JavaScript |
+| Git | Latest | Versionskontrolle |
 
-### Dateistruktur im Repo
+## Mock-Modus Testing
+
+```bash
+cd terraform
+terraform init
+terraform apply \
+  -var="use_mock_provider=true" \
+  -var="deployment_id=test-123" \
+  -var="project_name=test-project" \
+  -var='student_emails=["test1@example.com","test2@example.com"]'
 ```
-NodeJS-Group-Project/
-├── template.yaml           # CloudStore Template Definition
-├── README.md               # Diese Datei
-└── terraform/
-    ├── main.tf             # Hauptlogik (Server, Network, Security)
-    ├── variables.tf        # Variablendefinitionen
-    ├── outputs.tf          # Rückgabewerte (Credentials)
-    └── cloud-init.yaml     # Server-Konfiguration & User-Skripte
+
+**Erstellt**:
+- ✅ Echte Passwörter für alle User
+- ✅ SSH-Keys
+- ✅ Outputs wie in Production
+- ❌ Keine echte VM
+
+## Vergleich mit `jupyter-notebook-server`
+
+| Feature | `jupyter-notebook-server` | `nodejs-dev-server` |
+|---------|--------------------------|---------------------|
+| **Use Case** | Data Science, Analytics | Web Development, APIs |
+| **Interface** | Browser-basiert (JupyterLab) | Terminal + Editor |
+| **Prozess-Isolation** | JupyterHub Spawner | PM2 Process Manager |
+| **Ports** | HTTPS 443 | HTTP 3000, 8080 |
+| **Package Manager** | pip | npm |
+| **Collaboration** | Shared Notebooks | Shared File System |
+
+## Kostenabschätzung
+
+**Standard-Konfiguration** (gp1.medium, 3 Studierende):
+- Hourly: ~0.15 EUR
+- Monthly: ~100 EUR
+
+**Large-Konfiguration** (gp1.large, 5+ Studierende):
+- Hourly: ~0.25 EUR
+- Monthly: ~180 EUR
+
+## Troubleshooting
+
+### Node.js App startet nicht
+
+```bash
+ssh ubuntu@<floating-ip>
+pm2 status
+pm2 logs
 ```
 
-## Wartung & Sicherheit
+### Port 3000 ist nicht erreichbar
 
-**Persistenz:** Dies ist eine ephemere Entwicklungsumgebung. Code sollte regelmäßig in ein externes Git-Repository gepusht werden. Bei einem `terraform destroy` sind alle Daten auf der VM verloren.
+```bash
+# UFW Status prüfen
+sudo ufw status
 
-**Updates:** Systemupdates (`apt upgrade`) werden automatisch beim ersten Start durchgeführt.
+# Port-Binding prüfen
+ss -tulnp | grep :3000
+```
 
-**Ports:** Nur Ports 22 (SSH), 3000 (App) und 8080 (Alt) sind von außen erreichbar.
+### Student kann sich nicht einloggen
 
----
+```bash
+# Benutzer existiert?
+sudo cat /etc/passwd | grep student1_test_de
 
-**Autor:** DHBW Cloud Engineering Team  
-**Lizenz:** MIT
+# Passwort zurücksetzen
+sudo passwd student1_test_de
+```
+
+### Git-Clone fehlgeschlagen
+
+```bash
+# Projektverzeichnis prüfen
+ls -la /home/student1_test_de/my-nodejs-project/
+# Manuell clonen
+sudo -u student1_test_de git clone <repo-url> /home/student1_test_de/my-nodejs-project/repo
+```
+
+## Weiterentwicklung
+
+Potenzielle Features:
+
+- [ ] NGINX Reverse Proxy für mehrere Apps
+- [ ] Docker Integration für Microservices
+- [ ] Let's Encrypt SSL-Zertifikate
+- [ ] VS Code Server Integration
+- [ ] Automatic Testing Pipeline
+- [ ] Resource Monitoring Dashboard
+
+## Lizenz
+
+MIT License - DHBW CloudStore Project

@@ -29,7 +29,7 @@ variable "admin_email" {
 variable "student_emails" {
   type = list(string)
   validation {
-    condition     = length(var.student_emails) > 0 && length(var.student_emails) <= 10
+    condition     = length(var.student_emails) > 0 && length(var.student_emails) <= 30
     error_message = "At least one student email is required."
   }
 }
