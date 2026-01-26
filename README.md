@@ -229,26 +229,6 @@ terraform apply \
 - ✅ Outputs wie in Production
 - ❌ Keine echte VM
 
-## Vergleich mit `jupyter-notebook-server`
-
-| Feature | `jupyter-notebook-server` | `nodejs-dev-server` |
-|---------|--------------------------|---------------------|
-| **Use Case** | Data Science, Analytics | Web Development, APIs |
-| **Interface** | Browser-basiert (JupyterLab) | Terminal + Editor |
-| **Prozess-Isolation** | JupyterHub Spawner | PM2 Process Manager |
-| **Ports** | HTTPS 443 | HTTP 3000, 8080 |
-| **Package Manager** | pip | npm |
-| **Collaboration** | Shared Notebooks | Shared File System |
-
-## Kostenabschätzung
-
-**Standard-Konfiguration** (gp1.medium, 3 Studierende):
-- Hourly: ~0.15 EUR
-- Monthly: ~100 EUR
-
-**Large-Konfiguration** (gp1.large, 5+ Studierende):
-- Hourly: ~0.25 EUR
-- Monthly: ~180 EUR
 
 ## Troubleshooting
 
@@ -288,17 +268,6 @@ ls -la /home/student1_test_de/my-nodejs-project/
 # Manuell clonen
 sudo -u student1_test_de git clone <repo-url> /home/student1_test_de/my-nodejs-project/repo
 ```
-
-## Weiterentwicklung
-
-Potenzielle Features:
-
-- [ ] NGINX Reverse Proxy für mehrere Apps
-- [ ] Docker Integration für Microservices
-- [ ] Let's Encrypt SSL-Zertifikate
-- [ ] VS Code Server Integration
-- [ ] Automatic Testing Pipeline
-- [ ] Resource Monitoring Dashboard
 
 ## Lizenz
 
