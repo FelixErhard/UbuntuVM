@@ -21,22 +21,22 @@ Die Infrastruktur basiert auf einer einzelnen Ubuntu 22.04 Instanz, die durch Se
 
 ```mermaid
 graph TD
-    Internet((Internet)) -->|TCP 22| SSH[SSH Deamon]
-    Internet -->|TCP 3000| App[Node.js App]
-    Internet -->|TCP 8080| Alt[Alt. Port]
+    Internet((Internet)) -->|TCP 22| SSH[SSH-Daemon]
+    Internet -->|TCP 3000| App[Node.js-App]
+    Internet -->|TCP 8080| Alt[Alt-Port]
     
-    subgraph "Ubuntu VM (Quota Managed)"
-        SSH --> Admin[Dozent (Sudo)]
-        SSH --> S1[Student 1]
-        SSH --> S2[Student 2]
+    subgraph VM["Ubuntu VM (Quota Managed)"]
+        SSH --> Admin[Dozent-Sudo]
+        SSH --> S1[Student1]
+        SSH --> S2[Student2]
         
         Admin -.->|Link| Shared[/opt/project]
         S1 -.->|Link| Shared
         S2 -.->|Link| Shared
         
-        subgraph "Shared Workspace (SGID)"
-            Shared --> Code[Source Code]
-            Code --> Git[Git Repo]
+        subgraph WS["Shared Workspace (SGID)"]
+            Shared --> Code[Source-Code]
+            Code --> Git[Git-Repo]
         end
     end
 ```
