@@ -12,3 +12,4 @@ ma_wwi_23seb_projekt_2-openrc.sh
 private_key.pem
 nodejs_key.pem
 key.pem
+.DS_Store
