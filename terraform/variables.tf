@@ -18,20 +18,17 @@ variable "use_mock_provider" {
   default     = false 
 }
 
+variable "app_name" {
+  description = "Name of the project (used for hostname and folder)"
+  type        = string
+  validation {
+    condition     = can(regex("^[a-z0-9-]{3,20}$", var.app_name))
+    error_message = "app_name: Nur Kleinbuchstaben, Zahlen und Bindestrich erlaubt (3-20 Zeichen)."
+  }
+}
 # ============================================================================
 # USER INPUTS (VALIDATED CONTRACT)
 # ============================================================================
-
-variable "project_name" {
-  description = "Name of the project (used for hostname and folder)"
-  type        = string
-  
-  validation {
-    # Regex: 3-20 Zeichen, Kleinbuchstaben, Zahlen, Bindestrich, Unterstrich
-    condition     = can(regex("^[a-zA-Z0-9-_]{3,20}$", var.project_name))
-    error_message = "Project name must be 3-20 characters (letters, numbers, -, _)."
-  }
-}
 
 variable "admin_email" {
   description = "Email address of the lecturer (admin)"

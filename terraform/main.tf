@@ -121,7 +121,7 @@ resource "openstack_compute_instance_v2" "nodejs_server" {
   }
 
   user_data = templatefile("${path.module}/cloud-init.yaml", {
-    project_name = var.project_name
+    app_name = var.app_name
     node_version = var.node_version
     git_repo_url = var.git_repo_url
     
@@ -156,6 +156,6 @@ resource "null_resource" "mock_nodejs_server" {
   count = var.use_mock_provider ? 1 : 0
   triggers = {
     deployment_id = var.deployment_id
-    project_name  = var.project_name
+    app_name  = var.app_name
   }
 }

@@ -18,7 +18,7 @@ template:
     - group-work
 
   parameters:
-    - name: project_name
+    - name: app_name
       type: string
       description: "Projektname (wird Hostname und Name des Shared-Folders)"
       required: true
@@ -77,17 +77,24 @@ template:
       description: "System ID der Instanz"
       display: false
 
+    - name: app_name
+      description: "Projektname"
+      display: true
+
     # USER OUTPUTS
     - name: app_url
       description: "Web-Server URL (Port 3000)"
       display: true
+
     - name: ssh_command
       description: "SSH Befehl"
       display: true
+
     - name: admin_credentials
       description: "Admin Login (Dozent)"
       sensitive: true
       display: false
+
     - name: student_credentials
       description: "Studenten Logins"
       sensitive: true

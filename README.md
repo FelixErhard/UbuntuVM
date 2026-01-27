@@ -50,7 +50,7 @@ Dieses Template erstellt einen vollständig konfigurierten Node.js Development S
 
 | Parameter | Typ | Beschreibung |
 |-----------|-----|--------------|
-| `project_name` | `string` | Projektname (definiert Hostname und Ordnername) |
+| `app_name` | `string` | Projektname (definiert Hostname und Ordnername) |
 | `student_emails` | `array` | Liste der Studierenden-E-Mails |
 | `admin_email` | `string` | Email-Adresse des Admins |
 ### Optional
@@ -78,7 +78,7 @@ Dieses Template erstellt einen vollständig konfigurierten Node.js Development S
 {
   "template_id": 4,
   "parameters": {
-    "project_name": "web-engineering-group-a",
+    "app_name": "web-engineering-group-a",
     "admin_email": "admin@dhbw.de",
     "student_emails": [
       "student1@dhbw.de",
@@ -147,7 +147,7 @@ terraform apply
 
 1. **SSH-Verbindung**: `ssh username@<floating-ip>` (aus `student_credentials`)
 2. **Passwort**: Aus `student_credentials[email].password`
-3. **Projektverzeichnis**: `/home/<username>/<project_name>/`
+3. **Projektverzeichnis**: `/home/<username>/<app_name>/`
 4. **App starten**:
    ```bash
    cd ~/my-nodejs-project
@@ -194,7 +194,7 @@ Ressourcen werden **pro Flavor** zugewiesen:
 3. **NVM Installation**: Global für alle Benutzer
 4. **NPM Global Packages**: PM2, Nodemon, TypeScript
 5. **User-Erstellung**: Automatisch für alle Studierenden
-6. **Projektverzeichnisse**: `/home/<username>/<project_name>/`
+6. **Projektverzeichnisse**: `/home/<username>/<app_name>/`
 7. **Git-Clone**: Optional, falls `git_repo_url` angegeben
 8. **Firewall-Setup**: UFW für Ports 22, 3000, 8080
 
@@ -218,7 +218,7 @@ terraform init
 terraform apply \
   -var="use_mock_provider=true" \
   -var="deployment_id=test-123" \
-  -var="project_name=test-project" \
+  -var="app_name=test-project" \
   -var='student_emails=["test1@example.com","test2@example.com"]'
 ```
 
