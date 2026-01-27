@@ -33,3 +33,8 @@ output "ssh_private_key" {
   sensitive = true
   value     = tls_private_key.nodejs_ssh_key.private_key_openssh
 }
+
+output "instance_id" {
+  description = "MANDATORY: VM ID for Backend Management"
+  value = var.use_mock_provider ? "mock-instance-id" : openstack_compute_instance_v2.nodejs_server[0].id
+}

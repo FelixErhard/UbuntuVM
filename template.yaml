@@ -1,7 +1,7 @@
 template:
-  name: "nodejs-dev-server"
-  display_name: "Node.js Development Server"
-  description: "Kollaborative Node.js Entwicklungsumgebung für Projektgruppen mit Shared-Workspace."
+  name: "nodejs-group-project"
+  display_name: "Node.js Group Project"
+  description: "Kollaborative Entwicklungsumgebung (Shared Workspace) für Web-Engineering Projekte."
   version: "1.1.0"
   category: "education"
   author: "DHBW CloudStore Team"
@@ -34,7 +34,7 @@ template:
 
     - name: student_emails
       type: array
-      description: "E-Mails der Gruppenmitglieder"
+      description: "E-Mails der Gruppenmitglieder (Max. 10)"
       required: true
       validation:
         min_items: 1
@@ -72,11 +72,17 @@ template:
         pattern: "^https?://.*\.git$|^$"
 
   outputs:
+    # SYSTEM PFLICHTFELD (Hidden)
+    - name: instance_id
+      description: "System ID der Instanz"
+      display: false
+
+    # USER OUTPUTS
     - name: app_url
       description: "Web-Server URL (Port 3000)"
       display: true
     - name: ssh_command
-      description: "SSH Befehl (Allgemein)"
+      description: "SSH Befehl"
       display: true
     - name: admin_credentials
       description: "Admin Login (Dozent)"
@@ -93,4 +99,4 @@ template:
 
   requirements:
     - "SSH Port 22 access"
-    - "Node.js application ports 3000, 8080"
+    - "Node.js ports 3000, 8080"

@@ -21,13 +21,9 @@ terraform {
 }
 
 provider "openstack" {
-  auth_url    = var.use_mock_provider ? "http://mock-openstack:5000/v3" : null
-  user_name   = var.use_mock_provider ? "mock_user" : null
-  tenant_name = var.use_mock_provider ? "mock_tenant" : null
-  password    = var.use_mock_provider ? "mock_password" : null
-  region      = var.use_mock_provider ? "mock_region" : null
-  use_octavia = var.use_mock_provider ? false : true
+  cloud = "openstack"
 }
+
 
 # --- Data Sources ---
 data "openstack_images_image_v2" "ubuntu" {
