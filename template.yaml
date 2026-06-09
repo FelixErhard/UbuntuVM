@@ -1,4 +1,5 @@
 template:
+  # --- METADATA ---
   name: "nodejs-group-project"
   display_name: "Node.js Group Project"
   description: "Kollaborative Entwicklungsumgebung (Shared Workspace) für Web-Engineering Projekte."
@@ -18,12 +19,19 @@ template:
     - group-work
 
   parameters:
+    # --- Allgemein ---
     - name: app_name
       type: string
       description: "Projektname (wird Hostname und Name des Shared-Folders)"
       required: true
       validation:
         pattern: "^[a-zA-Z0-9-_]{3,20}$"
+      x-ui:
+        group: "Allgemein"
+        order: 1
+        icon: Server
+        placeholder: "z.B. web-engineering-project"
+        hint: "Nur Buchstaben, Zahlen, Bindestriche und Unterstriche (3-20 Zeichen)"
 
     - name: admin_email
       type: string
@@ -31,6 +39,12 @@ template:
       required: true
       validation:
         pattern: "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
+      x-ui:
+        group: "Allgemein"
+        order: 2
+        icon: Users
+        placeholder: "dozent@dhbw-mannheim.de"
+        widget: user-picker
 
     - name: student_emails
       type: array
@@ -39,40 +53,64 @@ template:
       validation:
         min_items: 1
         max_items: 10
+      x-ui:
+        group: "Allgemein"
+        order: 3
+        icon: Users
+        widget: user-picker
 
+    # --- Ressourcen ---
     - name: flavor_name
       type: selection
-      description: "Ressourcen (Quota)"
+      description: "VM-Größe für die Shared Development Environment"
       required: true
       options:
-        - label: "Small (1 CPU, 2GB RAM)"
+        - label: "Small (1 CPU, 2 GB RAM)"
           value: "gp1.small"
-        - label: "Medium (2 CPU, 4GB RAM)"
+        - label: "Medium (2 CPU, 4 GB RAM) — Empfohlen"
           value: "gp1.medium"
-        - label: "Large (4 CPU, 8GB RAM)"
+        - label: "Large (4 CPU, 8 GB RAM)"
           value: "gp1.large"
       default: "gp1.medium"
+      x-ui:
+        group: "Ressourcen"
+        order: 1
+        icon: Cpu
+        hint: "Für 3-5 Personen wird Medium empfohlen"
 
+    # --- Node.js Optionen ---
     - name: node_version
       type: selection
       description: "Node.js Version"
       required: true
       options:
-        - label: "Node.js 20 (LTS)"
+        - label: "Node.js 20 (LTS) — Empfohlen"
           value: "20"
         - label: "Node.js 18 (LTS)"
           value: "18"
       default: "20"
+      x-ui:
+        group: "Node.js Optionen"
+        order: 1
+        icon: Server
+        hint: "LTS-Versionen für stabile Projekte empfohlen"
 
+    # --- Repository ---
     - name: git_repo_url
       type: string
       description: "Git Repository URL (wird in den Shared Folder geklont)"
       required: false
       validation:
-        pattern: "^https?://.*\.git$|^$"
+        pattern: "^https?://.*\\.git$|^$"
+      x-ui:
+        group: "Repository"
+        order: 1
+        icon: GitBranch
+        placeholder: "https://github.com/example/repo.git"
+        hint: "Optional: Projekt-Repository wird automatisch geklont"
 
   outputs:
-    # SYSTEM PFLICHTFELD (Hidden)
+    # SYSTEM PFLICHTFELDER (Hidden)
     - name: instance_id
       description: "System ID der Instanz"
       display: false
@@ -87,23 +125,34 @@ template:
       display: true
 
     - name: ssh_command
-      description: "SSH Befehl"
+      description: "SSH Befehl für Zugriff"
+      display: true
+
+    - name: shared_folder_path
+      description: "Pfad zum Shared Workspace"
       display: true
 
     - name: admin_credentials
-      description: "Admin Login (Dozent)"
+      description: "Admin-Zugangsdaten (Dozent)"
       sensitive: true
       display: false
 
     - name: student_credentials
-      description: "Studenten Logins"
+      description: "Studierenden-Zugangsdaten"
+      sensitive: true
+      display: false
+
+    - name: ssh_private_key
+      description: "SSH Private Key"
       sensitive: true
       display: false
 
   estimated_costs:
-    hourly: "0.10 - 0.25 EUR"
-    monthly: "70 - 180 EUR"
+    hourly: "0.05 - 0.15 EUR"
+    monthly: "40 - 110 EUR"
 
   requirements:
-    - "SSH Port 22 access"
-    - "Node.js ports 3000, 8080"
+    - "SSH Port 22"
+    - "Node.js Port 3000"
+    - "Node.js Port 8080 (Optional: Zusätzliche Services)"
+    - "Git für Repository-Klone"
