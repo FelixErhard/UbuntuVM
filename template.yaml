@@ -8,6 +8,9 @@ template:
   author: "DHBW CloudStore Team"
   icon: nodejs.png
 
+  email_credentials:
+    enabled: true
+
   terraform:
     working_dir: terraform/
     required_version: ">= 1.6.0"
