@@ -58,6 +58,7 @@ template:
         order: 3
         icon: Users
         widget: user-picker
+        multi: true
 
     # --- Ressourcen ---
     - name: flavor_name
