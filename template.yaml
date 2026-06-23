@@ -1,162 +1,166 @@
-template:
-  # --- METADATA ---
-  name: "nodejs-group-project"
-  display_name: "Node.js Group Project"
-  description: "Kollaborative Entwicklungsumgebung (Shared Workspace) für Web-Engineering Projekte."
-  version: "1.1.0"
-  category: "education"
-  author: "DHBW CloudStore Team"
-  icon: nodejs.png
 
-  email_credentials:
-    enabled: true
+# --- METADATA ---
+name: "nodejs-group-project"
+display_name: "Node.js Group Project"
+description: "Kollaborative Entwicklungsumgebung (Shared Workspace) für Web-Engineering Projekte."
+version: "1.1.0"
+category: "education"
+author: "DHBW CloudStore Team"
+icon: nodejs.png
 
-  terraform:
-    working_dir: terraform/
-    required_version: ">= 1.6.0"
+email_credentials:
+  enabled: true
 
-  tags:
-    - nodejs
-    - javascript
-    - education
-    - group-work
+terraform:
+  working_dir: terraform/
+  required_version: ">= 1.6.0"
 
-  parameters:
-    # --- Allgemein ---
-    - name: app_name
-      type: string
-      description: "Projektname (wird Hostname und Name des Shared-Folders)"
-      required: true
-      validation:
-        pattern: "^[a-zA-Z0-9-_]{3,20}$"
-      x-ui:
-        group: "Allgemein"
-        order: 1
-        icon: Server
-        placeholder: "z.B. web-engineering-project"
-        hint: "Nur Buchstaben, Zahlen, Bindestriche und Unterstriche (3-20 Zeichen)"
+tags:
+  - nodejs
+  - javascript
+  - education
+  - group-work
 
-    - name: admin_email
-      type: string
-      description: "E-Mail des Dozenten (erhält Sudo-Rechte)"
-      required: true
-      validation:
-        pattern: "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
-      x-ui:
-        group: "Allgemein"
-        order: 2
-        icon: Users
-        placeholder: "dozent@dhbw-mannheim.de"
-        widget: user-picker
 
-    - name: student_emails
-      type: array
-      description: "E-Mails der Gruppenmitglieder (Max. 10)"
-      required: true
-      validation:
-        min_items: 1
-        max_items: 10
-      x-ui:
-        group: "Allgemein"
-        order: 3
-        icon: Users
-        widget: user-picker
-        multi: true
+deploy-strategy: 
+  options: ['per-group', 'per-instance', 'per-user']
 
-    # --- Ressourcen ---
-    - name: flavor_name
-      type: selection
-      description: "VM-Größe für die Shared Development Environment"
-      required: true
-      options:
-        - label: "Small (1 CPU, 2 GB RAM)"
-          value: "gp1.small"
-        - label: "Medium (2 CPU, 4 GB RAM) — Empfohlen"
-          value: "gp1.medium"
-        - label: "Large (4 CPU, 8 GB RAM)"
-          value: "gp1.large"
-      default: "gp1.medium"
-      x-ui:
-        group: "Ressourcen"
-        order: 1
-        icon: Cpu
-        hint: "Für 3-5 Personen wird Medium empfohlen"
+parameters:
+  # --- Allgemein ---
+  - name: app_name
+    type: string
+    description: "Projektname (wird Hostname und Name des Shared-Folders)"
+    required: true
+    validation:
+      pattern: "^[a-zA-Z0-9-_]{3,20}$"
+    x-ui:
+      group: "Allgemein"
+      order: 1
+      icon: Server
+      placeholder: "z.B. web-engineering-project"
+      hint: "Nur Buchstaben, Zahlen, Bindestriche und Unterstriche (3-20 Zeichen)"
 
-    # --- Node.js Optionen ---
-    - name: node_version
-      type: selection
-      description: "Node.js Version"
-      required: true
-      options:
-        - label: "Node.js 20 (LTS) — Empfohlen"
-          value: "20"
-        - label: "Node.js 18 (LTS)"
-          value: "18"
-      default: "20"
-      x-ui:
-        group: "Node.js Optionen"
-        order: 1
-        icon: Server
-        hint: "LTS-Versionen für stabile Projekte empfohlen"
+  - name: admin_email
+    type: string
+    description: "E-Mail des Dozenten (erhält Sudo-Rechte)"
+    required: true
+    validation:
+      pattern: "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
+    x-ui:
+      group: "Allgemein"
+      order: 2
+      icon: Users
+      placeholder: "dozent@dhbw-mannheim.de"
+      widget: user-picker
 
-    # --- Repository ---
-    - name: git_repo_url
-      type: string
-      description: "Git Repository URL (wird in den Shared Folder geklont)"
-      required: false
-      validation:
-        pattern: "^https?://.*\\.git$|^$"
-      x-ui:
-        group: "Repository"
-        order: 1
-        icon: GitBranch
-        placeholder: "https://github.com/example/repo.git"
-        hint: "Optional: Projekt-Repository wird automatisch geklont"
+  - name: student_emails
+    type: array
+    description: "E-Mails der Gruppenmitglieder (Max. 10)"
+    required: true
+    validation:
+      min_items: 1
+      max_items: 10
+    x-ui:
+      group: "Allgemein"
+      order: 3
+      icon: Users
+      widget: user-picker
+      multi: true
 
-  outputs:
-    # SYSTEM PFLICHTFELDER (Hidden)
-    - name: instance_id
-      description: "System ID der Instanz"
-      display: false
+  # --- Ressourcen ---
+  - name: flavor_name
+    type: selection
+    description: "VM-Größe für die Shared Development Environment"
+    required: true
+    options:
+      - label: "Small (1 CPU, 2 GB RAM)"
+        value: "gp1.small"
+      - label: "Medium (2 CPU, 4 GB RAM) — Empfohlen"
+        value: "gp1.medium"
+      - label: "Large (4 CPU, 8 GB RAM)"
+        value: "gp1.large"
+    default: "gp1.medium"
+    x-ui:
+      group: "Ressourcen"
+      order: 1
+      icon: Cpu
+      hint: "Für 3-5 Personen wird Medium empfohlen"
 
-    - name: app_name
-      description: "Projektname"
-      display: true
+  # --- Node.js Optionen ---
+  - name: node_version
+    type: selection
+    description: "Node.js Version"
+    required: true
+    options:
+      - label: "Node.js 20 (LTS) — Empfohlen"
+        value: "20"
+      - label: "Node.js 18 (LTS)"
+        value: "18"
+    default: "20"
+    x-ui:
+      group: "Node.js Optionen"
+      order: 1
+      icon: Server
+      hint: "LTS-Versionen für stabile Projekte empfohlen"
 
-    # USER OUTPUTS
-    - name: app_url
-      description: "Web-Server URL (Port 3000)"
-      display: true
+  # --- Repository ---
+  - name: git_repo_url
+    type: string
+    description: "Git Repository URL (wird in den Shared Folder geklont)"
+    required: false
+    validation:
+      pattern: "^https?://.*\\.git$|^$"
+    x-ui:
+      group: "Repository"
+      order: 1
+      icon: GitBranch
+      placeholder: "https://github.com/example/repo.git"
+      hint: "Optional: Projekt-Repository wird automatisch geklont"
 
-    - name: ssh_command
-      description: "SSH Befehl für Zugriff"
-      display: true
+outputs:
+  # SYSTEM PFLICHTFELDER (Hidden)
+  - name: instance_id
+    description: "System ID der Instanz"
+    display: false
 
-    - name: shared_folder_path
-      description: "Pfad zum Shared Workspace"
-      display: true
+  - name: app_name
+    description: "Projektname"
+    display: true
 
-    - name: admin_credentials
-      description: "Admin-Zugangsdaten (Dozent)"
-      sensitive: true
-      display: false
+  # USER OUTPUTS
+  - name: app_url
+    description: "Web-Server URL (Port 3000)"
+    display: true
 
-    - name: student_credentials
-      description: "Studierenden-Zugangsdaten"
-      sensitive: true
-      display: false
+  - name: ssh_command
+    description: "SSH Befehl für Zugriff"
+    display: true
 
-    - name: ssh_private_key
-      description: "SSH Private Key"
-      sensitive: true
-      display: false
+  - name: shared_folder_path
+    description: "Pfad zum Shared Workspace"
+    display: true
 
-  estimated_costs:
-    hourly: "0.05 - 0.15 EUR"
-    monthly: "40 - 110 EUR"
+  - name: admin_credentials
+    description: "Admin-Zugangsdaten (Dozent)"
+    sensitive: true
+    display: false
 
-  requirements:
-    - "SSH Port 22"
-    - "Node.js Port 3000"
-    - "Node.js Port 8080 (Optional: Zusätzliche Services)"
-    - "Git für Repository-Klone"
+  - name: student_credentials
+    description: "Studierenden-Zugangsdaten"
+    sensitive: true
+    display: false
+
+  - name: ssh_private_key
+    description: "SSH Private Key"
+    sensitive: true
+    display: false
+
+estimated_costs:
+  hourly: "0.05 - 0.15 EUR"
+  monthly: "40 - 110 EUR"
+
+requirements:
+  - "SSH Port 22"
+  - "Node.js Port 3000"
+  - "Node.js Port 8080 (Optional: Zusätzliche Services)"
+  - "Git für Repository-Klone"
