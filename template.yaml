@@ -23,7 +23,9 @@ tags:
 
 
 deploy-strategy: 
-  options: ['per-group', 'per-instance', 'per-user']
+  one-instance: true
+  one-per-user: true
+  one-per-group: true
 
 parameters:
   # --- Allgemein ---
