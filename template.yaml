@@ -28,7 +28,7 @@ deploy-strategy:
   one-per-group: true
 
 parameters:
-  generic:
+  general:
   # --- Allgemein ---
     - name: app_name
       type: string
