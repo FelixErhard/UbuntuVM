@@ -58,7 +58,7 @@ parameters:
 
     - name: student_emails
       type: array
-      description: "E-Mails der Gruppenmitglieder (Max. 10)"
+      description: "E-Mails der Studierenden (Max. 10)"
       required: true
       validation:
         min_items: 1
@@ -69,6 +69,20 @@ parameters:
         icon: Users
         widget: user-picker
         multi: true
+
+    - name: groups
+      type: object
+      description: "Gruppen mit Mitgliedern (optional)"
+      required: false
+      default: {}
+      x-ui:
+        group: "Allgemein"
+        order: 4
+        icon: Users
+        widget: group-builder
+        extract: email
+        hint: "Gruppen anlegen und Studierende individuell zuweisen"
+
   specific:
     # --- Ressourcen ---
     - name: flavor_name
