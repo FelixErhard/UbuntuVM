@@ -42,9 +42,8 @@ write_files:
       server.listen(3000, '0.0.0.0');
 
 runcmd:
-  # 1. SSH Config für Passwörter erzwingen (Sicherheitsnetz)
-  - sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/g' /etc/ssh/sshd_config
-  - sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/g' /etc/ssh/sshd_config.d/*.conf || true
+  # 1. SSH Config für Passwörter erzwingen (überschreibt alle anderen configs)
+  - echo "PasswordAuthentication yes" > /etc/ssh/sshd_config.d/99-password-auth.conf
   - systemctl restart ssh
 
   # 2. Install Node & Tools
