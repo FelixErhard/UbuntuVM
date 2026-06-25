@@ -28,96 +28,97 @@ deploy-strategy:
   one-per-group: true
 
 parameters:
+  generic:
   # --- Allgemein ---
-  - name: app_name
-    type: string
-    description: "Projektname (wird Hostname und Name des Shared-Folders)"
-    required: true
-    validation:
-      pattern: "^[a-zA-Z0-9-_]{3,20}$"
-    x-ui:
-      group: "Allgemein"
-      order: 1
-      icon: Server
-      placeholder: "z.B. web-engineering-project"
-      hint: "Nur Buchstaben, Zahlen, Bindestriche und Unterstriche (3-20 Zeichen)"
+    - name: app_name
+      type: string
+      description: "Projektname (wird Hostname und Name des Shared-Folders)"
+      required: true
+      validation:
+        pattern: "^[a-zA-Z0-9-_]{3,20}$"
+      x-ui:
+        group: "Allgemein"
+        order: 1
+        icon: Server
+        placeholder: "z.B. web-engineering-project"
+        hint: "Nur Buchstaben, Zahlen, Bindestriche und Unterstriche (3-20 Zeichen)"
 
-  - name: admin_email
-    type: string
-    description: "E-Mail des Dozenten (erhält Sudo-Rechte)"
-    required: true
-    validation:
-      pattern: "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
-    x-ui:
-      group: "Allgemein"
-      order: 2
-      icon: Users
-      placeholder: "dozent@dhbw-mannheim.de"
-      widget: user-picker
+    - name: admin_email
+      type: string
+      description: "E-Mail des Dozenten (erhält Sudo-Rechte)"
+      required: true
+      validation:
+        pattern: "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
+      x-ui:
+        group: "Allgemein"
+        order: 2
+        icon: Users
+        placeholder: "dozent@dhbw-mannheim.de"
+        widget: user-picker
 
-  - name: student_emails
-    type: array
-    description: "E-Mails der Gruppenmitglieder (Max. 10)"
-    required: true
-    validation:
-      min_items: 1
-      max_items: 10
-    x-ui:
-      group: "Allgemein"
-      order: 3
-      icon: Users
-      widget: user-picker
-      multi: true
+    - name: student_emails
+      type: array
+      description: "E-Mails der Gruppenmitglieder (Max. 10)"
+      required: true
+      validation:
+        min_items: 1
+        max_items: 10
+      x-ui:
+        group: "Allgemein"
+        order: 3
+        icon: Users
+        widget: user-picker
+        multi: true
+  specific:
+    # --- Ressourcen ---
+    - name: flavor_name
+      type: selection
+      description: "VM-Größe für die Shared Development Environment"
+      required: true
+      options:
+        - label: "Small (1 CPU, 2 GB RAM)"
+          value: "gp1.small"
+        - label: "Medium (2 CPU, 4 GB RAM) — Empfohlen"
+          value: "gp1.medium"
+        - label: "Large (4 CPU, 8 GB RAM)"
+          value: "gp1.large"
+      default: "gp1.medium"
+      x-ui:
+        group: "Ressourcen"
+        order: 1
+        icon: Cpu
+        hint: "Für 3-5 Personen wird Medium empfohlen"
 
-  # --- Ressourcen ---
-  - name: flavor_name
-    type: selection
-    description: "VM-Größe für die Shared Development Environment"
-    required: true
-    options:
-      - label: "Small (1 CPU, 2 GB RAM)"
-        value: "gp1.small"
-      - label: "Medium (2 CPU, 4 GB RAM) — Empfohlen"
-        value: "gp1.medium"
-      - label: "Large (4 CPU, 8 GB RAM)"
-        value: "gp1.large"
-    default: "gp1.medium"
-    x-ui:
-      group: "Ressourcen"
-      order: 1
-      icon: Cpu
-      hint: "Für 3-5 Personen wird Medium empfohlen"
+    # --- Node.js Optionen ---
+    - name: node_version
+      type: selection
+      description: "Node.js Version"
+      required: true
+      options:
+        - label: "Node.js 20 (LTS) — Empfohlen"
+          value: "20"
+        - label: "Node.js 18 (LTS)"
+          value: "18"
+      default: "20"
+      x-ui:
+        group: "Node.js Optionen"
+        order: 1
+        icon: Server
+        hint: "LTS-Versionen für stabile Projekte empfohlen"
 
-  # --- Node.js Optionen ---
-  - name: node_version
-    type: selection
-    description: "Node.js Version"
-    required: true
-    options:
-      - label: "Node.js 20 (LTS) — Empfohlen"
-        value: "20"
-      - label: "Node.js 18 (LTS)"
-        value: "18"
-    default: "20"
-    x-ui:
-      group: "Node.js Optionen"
-      order: 1
-      icon: Server
-      hint: "LTS-Versionen für stabile Projekte empfohlen"
-
-  # --- Repository ---
-  - name: git_repo_url
-    type: string
-    description: "Git Repository URL (wird in den Shared Folder geklont)"
-    required: false
-    validation:
-      pattern: "^https?://.*\\.git$|^$"
-    x-ui:
-      group: "Repository"
-      order: 1
-      icon: GitBranch
-      placeholder: "https://github.com/example/repo.git"
-      hint: "Optional: Projekt-Repository wird automatisch geklont"
+    # --- Repository ---
+    - name: git_repo_url
+      type: string
+      description: "Git Repository URL (wird in den Shared Folder geklont)"
+      required: false
+      validation:
+        pattern: "^https?://.*\\.git$|^$"
+      x-ui:
+        group: "Repository"
+        order: 1
+        icon: GitBranch
+        placeholder: "https://github.com/example/repo.git"
+        hint: "Optional: Projekt-Repository wird automatisch geklont"
 
 outputs:
   # SYSTEM PFLICHTFELDER (Hidden)
