@@ -30,32 +30,30 @@ variable "app_name" {
 # USER INPUTS (VALIDATED CONTRACT)
 # ============================================================================
 
-variable "admin_email" {
-  description = "Email address of the lecturer (admin)"
+variable "admin_username" {
+  description = "Username of the lecturer (admin)"
   type        = string
 
   validation {
-    condition     = can(regex("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$", var.admin_email))
-    error_message = "The admin_email is invalid."
+    condition     = can(regex("^[a-z0-9._-]{1,32}$", var.admin_username))
+    error_message = "admin_username must be a valid Linux username (max 32 chars, lowercase)."
   }
 }
 
-variable "student_emails" {
-  description = "List of student emails"
+variable "student_usernames" {
+  description = "List of student usernames"
   type        = list(string)
-  
+
   validation {
-    # YAML Limit: Max 10 Students
-    condition     = length(var.student_emails) > 0 && length(var.student_emails) <= 10
-    error_message = "You must provide between 1 and 10 student emails."
+    condition     = length(var.student_usernames) > 0 && length(var.student_usernames) <= 10
+    error_message = "You must provide between 1 and 10 student usernames."
   }
 
   validation {
-    # Prüft, ob ALLE E-Mails im Array valide sind
     condition = alltrue([
-      for email in var.student_emails : can(regex("^\\S+@\\S+\\.\\S+$", email))
+      for u in var.student_usernames : can(regex("^[a-z0-9._-]{1,32}$", u))
     ])
-    error_message = "All items in student_emails must be valid email addresses."
+    error_message = "All student usernames must be valid Linux usernames (max 32 chars, lowercase)."
   }
 }
 

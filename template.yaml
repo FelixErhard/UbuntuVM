@@ -43,9 +43,9 @@ parameters:
         placeholder: "z.B. web-engineering-project"
         hint: "Nur Buchstaben, Zahlen, Bindestriche und Unterstriche (3-20 Zeichen)"
 
-    - name: admin_email
+    - name: admin_username
       type: string
-      description: "E-Mail des Dozenten (erhält Sudo-Rechte)"
+      description: "Username des Dozenten (erhält Sudo-Rechte)"
       required: true
       validation:
         pattern: "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
@@ -53,12 +53,13 @@ parameters:
         group: "Allgemein"
         order: 2
         icon: Users
-        placeholder: "dozent@dhbw-mannheim.de"
+        placeholder: "Prof1"
         widget: user-picker
+        extract: name
 
-    - name: student_emails
+    - name: student_usernames
       type: array
-      description: "E-Mails der Studierenden (Max. 10)"
+      description: "Usernames der Studierenden (Max. 10)"
       required: true
       validation:
         min_items: 1
@@ -69,6 +70,7 @@ parameters:
         icon: Users
         widget: user-picker
         multi: true
+        extract: name
 
     - name: groups
       type: object

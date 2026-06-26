@@ -45,7 +45,7 @@ data "openstack_networking_network_v2" "external" {
 
 # --- Credentials ---
 resource "random_password" "student_passwords" {
-  for_each         = toset(var.student_emails)
+  for_each         = toset(var.student_usernames)
   length           = 16
   special          = true
   override_special = "_%@"
@@ -126,14 +126,14 @@ resource "openstack_compute_instance_v2" "nodejs_server" {
     git_repo_url = var.git_repo_url
     
     # Admin User Processing (nur local part vor @, max 32 Zeichen)
-    admin_username = replace(lower(split("@", var.admin_email)[0]), ".", "_")
+    admin_username = var.admin_username
     admin_password = random_password.admin_password.result
 
     # Student User Processing (nur local part vor @, max 32 Zeichen)
     students = [
-      for email in var.student_emails : {
-        username = replace(lower(split("@", email)[0]), ".", "_")
-        password = random_password.student_passwords[email].result
+      for username in var.student_usernames : {
+        username = username
+        password = random_password.student_passwords[username].result
       }
     ]
   })

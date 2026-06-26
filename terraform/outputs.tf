@@ -26,9 +26,9 @@ output "admin_credentials" {
   description = "Lecturer/Admin Login"
   sensitive   = true
   value = {
-    username    = replace(lower(split("@", var.admin_email)[0]), ".", "_")
+    username    = var.admin_username
     password    = random_password.admin_password.result
-    ssh_command = "ssh ${replace(lower(split("@", var.admin_email)[0]), ".", "_")}@${var.use_mock_provider ? "mock-ip" : openstack_networking_floatingip_v2.nodejs_fip[0].address}"
+    ssh_command = "ssh ${var.admin_username}@${var.use_mock_provider ? "mock-ip" : openstack_networking_floatingip_v2.nodejs_fip[0].address}"
   }
 }
 
@@ -36,10 +36,10 @@ output "student_credentials" {
   description = "Student Logins"
   sensitive   = true
   value = {
-    for email in var.student_emails : email => {
-      username    = replace(lower(split("@", email)[0]), ".", "_")
-      password    = random_password.student_passwords[email].result
-      ssh_command = "ssh ${replace(lower(split("@", email)[0]), ".", "_")}@${var.use_mock_provider ? "mock-ip" : openstack_networking_floatingip_v2.nodejs_fip[0].address}"
+    for username in var.student_usernames : username => {
+      username      = username
+      password      = random_password.student_passwords[username].result
+      ssh_command   = "ssh ${username}@${var.use_mock_provider ? "mock-ip" : openstack_networking_floatingip_v2.nodejs_fip[0].address}"
       shared_folder = "/opt/${var.app_name}"
     }
   }
