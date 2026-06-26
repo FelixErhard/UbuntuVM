@@ -68,14 +68,14 @@ runcmd:
   
   # Admin (Dozent)
   - useradd -m -s /bin/bash -G sudo,webdevs ${admin_username}
-  - echo '${admin_username}:${admin_password}' | chpasswd
+  - printf '%s:%s\n' '${admin_username}' '${admin_password}' | chpasswd
   - ln -s /opt/${app_name} /home/${admin_username}/project
   - chown -h ${admin_username}:${admin_username} /home/${admin_username}/project
 
   # Students Loop
 %{ for student in students ~}
   - useradd -m -s /bin/bash -G webdevs ${student.username}
-  - echo '${student.username}:${student.password}' | chpasswd
+  - printf '%s:%s\n' '${student.username}' '${student.password}' | chpasswd
   - ln -s /opt/${app_name} /home/${student.username}/project
   - chown -h ${student.username}:${student.username} /home/${student.username}/project
 %{ endfor ~}
@@ -91,7 +91,9 @@ runcmd:
 
   # 6. Start Welcome App & Firewall
   - pm2 start /opt/welcome-app/server.js --name welcome
-  - pm2 save
   - pm2 startup systemd
-  - ufw allow 22,3000,8080/tcp
+  - pm2 save
+  - ufw allow proto tcp to any port 22
+  - ufw allow proto tcp to any port 3000
+  - ufw allow proto tcp to any port 8080
   - echo "y" | ufw enable

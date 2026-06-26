@@ -125,14 +125,14 @@ resource "openstack_compute_instance_v2" "nodejs_server" {
     node_version = var.node_version
     git_repo_url = var.git_repo_url
     
-    # Admin User Processing
-    admin_username = replace(replace(lower(var.admin_email), "@", "_"), ".", "_")
+    # Admin User Processing (nur local part vor @, max 32 Zeichen)
+    admin_username = replace(lower(split("@", var.admin_email)[0]), ".", "_")
     admin_password = random_password.admin_password.result
 
-    # Student User Processing
+    # Student User Processing (nur local part vor @, max 32 Zeichen)
     students = [
       for email in var.student_emails : {
-        username = replace(replace(lower(email), "@", "_"), ".", "_")
+        username = replace(lower(split("@", email)[0]), ".", "_")
         password = random_password.student_passwords[email].result
       }
     ]
