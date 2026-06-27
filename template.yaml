@@ -94,7 +94,7 @@ parameters:
       required: false
       default: {}
       x-ui:
-        group_id: specific
+        group_id: general
         in_group_order: 4        
         icon: Users
         widget: 
