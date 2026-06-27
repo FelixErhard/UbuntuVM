@@ -53,6 +53,7 @@ parameters:
         icon: Server
         placeholder: "z.B. web-engineering-project"
         hint: "Nur Buchstaben, Zahlen, Bindestriche und Unterstriche (3-20 Zeichen)"
+        warning: "Test warnining"
 
     - name: admin_username
       type: string
@@ -121,6 +122,7 @@ parameters:
         in_group_order: 1        
         icon: Cpu
         hint: "Für 3-5 Personen wird Medium empfohlen"
+        hidden: true
 
     # --- Node.js Optionen ---
     - name: node_version
