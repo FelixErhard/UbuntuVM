@@ -63,7 +63,7 @@ parameters:
       x-ui:
         group_id: general
         in_group_order: 2           
-        icon: Users
+        icon: gem
         placeholder: "Prof1"
         widget: 
           type: user-picker
