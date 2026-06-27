@@ -52,8 +52,7 @@ parameters:
         in_group_order: 1           
         icon: Server
         placeholder: "z.B. web-engineering-project"
-        hint: "Nur Buchstaben, Zahlen, Bindestriche und Unterstriche (3-20 Zeichen)"
-        warning: "Test warnining"
+        hint: "Nur Buchstaben, Zahlen, Bindestriche und Unterstriche (3-20 Zeichen)"       
 
     - name: admin_username
       type: string
@@ -90,7 +89,7 @@ parameters:
           extract: name
 
     - name: groups
-      type: object
+      type: groups
       description: "Gruppen mit Mitgliedern (optional)"
       required: false
       default: {}
