@@ -24,6 +24,7 @@ ui-groups:
     order: 2
   - id: specific
     title: "Spezifische Settings"
+    collapsed: true
 
 
 tags:
