@@ -54,8 +54,12 @@ parameters:
         order: 2
         icon: Users
         placeholder: "Prof1"
-        widget: user-picker
-        extract: name
+        widget: 
+          type: user-picker
+          extract: name
+          multi: false
+        
+        
 
     - name: student_usernames
       type: array
@@ -68,9 +72,10 @@ parameters:
         group: "Allgemein"
         order: 3
         icon: Users
-        widget: user-picker
-        multi: true
-        extract: name
+        widget:
+          type: user-picker
+          multi: true
+          extract: name
 
     - name: groups
       type: object
@@ -81,8 +86,9 @@ parameters:
         group: "Allgemein"
         order: 4
         icon: Users
-        widget: group-builder
-        extract: email
+        widget: 
+          type: group-builder
+          extract: name
         hint: "Gruppen anlegen und Studierende individuell zuweisen"
 
   specific:
@@ -173,13 +179,3 @@ outputs:
     description: "SSH Private Key"
     sensitive: true
     display: false
-
-estimated_costs:
-  hourly: "0.05 - 0.15 EUR"
-  monthly: "40 - 110 EUR"
-
-requirements:
-  - "SSH Port 22"
-  - "Node.js Port 3000"
-  - "Node.js Port 8080 (Optional: Zusätzliche Services)"
-  - "Git für Repository-Klone"
