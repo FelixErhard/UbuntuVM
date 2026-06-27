@@ -15,6 +15,17 @@ terraform:
   working_dir: terraform/
   required_version: ">= 1.6.0"
 
+ui-groups:
+  - id: general
+    title: "Allgemein und Nutzer"
+    order: 1
+  - id: resources
+    title: "Ressourcen"
+    order: 2
+  - id: specific
+    title: "Spezifische Settings"
+
+
 tags:
   - nodejs
   - javascript
@@ -37,8 +48,8 @@ parameters:
       validation:
         pattern: "^[a-zA-Z0-9-_]{3,20}$"
       x-ui:
-        group: "Allgemein"
-        order: 1
+        group_id: general
+        in_group_order: 1           
         icon: Server
         placeholder: "z.B. web-engineering-project"
         hint: "Nur Buchstaben, Zahlen, Bindestriche und Unterstriche (3-20 Zeichen)"
@@ -50,8 +61,8 @@ parameters:
       validation:
         pattern: "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
       x-ui:
-        group: "Allgemein"
-        order: 2
+        group_id: general
+        in_group_order: 2           
         icon: Users
         placeholder: "Prof1"
         widget: 
@@ -69,8 +80,8 @@ parameters:
         min_items: 1
         max_items: 10
       x-ui:
-        group: "Allgemein"
-        order: 3
+        group_id: general
+        in_group_order: 3           
         icon: Users
         widget:
           type: user-picker
@@ -83,8 +94,8 @@ parameters:
       required: false
       default: {}
       x-ui:
-        group: "Allgemein"
-        order: 4
+        group_id: specific
+        in_group_order: 4        
         icon: Users
         widget: 
           type: group-builder
@@ -106,8 +117,8 @@ parameters:
           value: "gp1.large"
       default: "gp1.medium"
       x-ui:
-        group: "Ressourcen"
-        order: 1
+        group_id: resources
+        in_group_order: 1        
         icon: Cpu
         hint: "Für 3-5 Personen wird Medium empfohlen"
 
@@ -123,8 +134,8 @@ parameters:
           value: "18"
       default: "20"
       x-ui:
-        group: "Node.js Optionen"
-        order: 1
+        group_id: specific
+        in_group_order: 1        
         icon: Server
         hint: "LTS-Versionen für stabile Projekte empfohlen"
 
@@ -136,8 +147,8 @@ parameters:
       validation:
         pattern: "^https?://.*\\.git$|^$"
       x-ui:
-        group: "Repository"
-        order: 1
+        group_id: specific
+        in_group_order: 2           
         icon: GitBranch
         placeholder: "https://github.com/example/repo.git"
         hint: "Optional: Projekt-Repository wird automatisch geklont"
