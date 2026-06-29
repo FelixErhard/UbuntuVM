@@ -23,8 +23,8 @@ ui-groups:
     title: "Ressourcen"
     order: 2
   - id: specific
-    title: "Spezifische Settings"
-    collapsed: true
+    title: "Spezifische App-Settings "
+    collapsed: false
 
 
 tags:
@@ -121,8 +121,7 @@ parameters:
         group_id: resources
         in_group_order: 1        
         icon: Cpu
-        hint: "Für 3-5 Personen wird Medium empfohlen"
-        hidden: true
+        hint: "Für 3-5 Personen wird Medium empfohlen"        
 
     # --- Node.js Optionen ---
     - name: node_version
