@@ -3,7 +3,7 @@
 name: "nodejs-group-project"
 display_name: "Node.js Group Project"
 description: "Kollaborative Entwicklungsumgebung (Shared Workspace) für Web-Engineering Projekte."
-version: "1.1.0"
+version: "1.1.1"
 category: "education"
 author: "DHBW CloudStore Team"
 icon: nodejs.png
@@ -28,7 +28,7 @@ ui-groups:
 
 
 tags:
-  - nodejs-new
+  - nodejs-new-new
   - javascript
   - education
   - group-work
